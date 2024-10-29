@@ -1916,6 +1916,7 @@ queue_request:
 		// }
 		continue;
 local_copy:
+		pr_info("NetChannel: Error should not use local copy in recv!\n");
 		if (!(flags & MSG_TRUNC)) {
 			err = skb_copy_datagram_msg(skb, offset, msg, used);
 			// printk("copy data done: %d\n", used);
