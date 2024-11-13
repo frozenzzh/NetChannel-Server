@@ -63,6 +63,7 @@ nd_dcopy_fetch_request(struct nd_dcopy_queue *queue)
 	return req;
 }
 
+static int forbidden_copy_core=8;
 /* round-robin */
 int nd_dcopy_sche_rr(int last_qid) {
 	struct nd_dcopy_queue *queue;
@@ -75,6 +76,8 @@ int nd_dcopy_sche_rr(int last_qid) {
 		qid = (i + last_q) % (nd_params.nd_num_dc_thread);
 		queue =  &nd_dcopy_q[qid * nd_params.nr_nodes + nd_params.data_cpy_core];
 		if(qid * nd_params.nr_nodes + nd_params.data_cpy_core == raw_smp_processor_id())
+			continue;
+		if(qid * nd_params.nr_nodes + nd_params.data_cpy_core == forbidden_copy_core)
 			continue;
 		if(atomic_read(&queue->queue_size) >= queue->queue_threshold)
 			continue;
