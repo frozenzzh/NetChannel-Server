@@ -2,6 +2,7 @@
     "files.associations": {
         "cstdlib": "c",
         "algorithm": "c",
-        "chrono": "c"
+        "chrono": "c",
+        "nd_impl.h": "c"
     }
 }

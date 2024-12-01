@@ -1,9 +1,10 @@
 #include "nd_data_copy.h"
 #include "nd_impl.h"
+#include "nd_data_copy_sche.h"
 
 static struct workqueue_struct *nd_dcopy_wq;
 
-static struct nd_dcopy_queue nd_dcopy_q[NR_CPUS];
+struct nd_dcopy_queue nd_dcopy_q[NR_CPUS];
 
 static inline void nd_dcopy_free_request(struct nd_dcopy_request *req) {
     if(req->clean_skb && req->skb){
@@ -66,34 +67,28 @@ nd_dcopy_fetch_request(struct nd_dcopy_queue *queue)
 static int forbidden_copy_core=8;
 /* round-robin */
 int nd_dcopy_sche_rr(int last_qid) {
-	struct nd_dcopy_queue *queue;
+	//原本内容
+	/*struct nd_dcopy_queue *queue;
 	int last_q =  (last_qid - nd_params.data_cpy_core) / nd_params.nr_nodes;
 	int i = 0, qid;
 	bool find = false;
 	
  	for (i = 1; i <= nd_params.nd_num_dc_thread; i++) {
-
 		qid = (i + last_q) % (nd_params.nd_num_dc_thread);
 		queue =  &nd_dcopy_q[qid * nd_params.nr_nodes + nd_params.data_cpy_core];
-		if(qid * nd_params.nr_nodes + nd_params.data_cpy_core == raw_smp_processor_id())
-			continue;
-		if(qid * nd_params.nr_nodes + nd_params.data_cpy_core == forbidden_copy_core)
-			continue;
-		if(atomic_read(&queue->queue_size) >= queue->queue_threshold)
-			continue;
+		if(qid * nd_params.nr_nodes + nd_params.data_cpy_core == raw_smp_processor_id()) continue;
+		if(qid * nd_params.nr_nodes + nd_params.data_cpy_core == forbidden_copy_core) continue;
+		if(atomic_read(&queue->queue_size) >= queue->queue_threshold) continue;
 		find = true;
 		last_q = qid;
 		break;
-		// return qid * 4 + nd_params.data_cpy_core;
 	}
-	if(!find) {
-		return -1;
-		// qid = (1 + last_q) % (nd_params.nd_num_dc_thread);
-		// last_q = qid;
-	}
-	return last_q * nd_params.nr_nodes + nd_params.data_cpy_core;
-	// }
-	// return -1;
+	if(!find) return -1;
+	return last_q * nd_params.nr_nodes + nd_params.data_cpy_core;*/
+	//新的改动
+	if (decide_update()) update();
+	return nd_dcopy_sche_smart_rr(last_qid);
+
 }
 
 /* compact */
